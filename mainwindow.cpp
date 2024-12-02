@@ -9,11 +9,11 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("Color Histogram");
 
     // OPEN AN IMAGE FILE
-    QAction *openImageAct = new QAction("open image file");
+    QAction *openImageAct = new QAction("Open Image File");
     connect(openImageAct, &QAction::triggered, this, &MainWindow::openImageSlot);
     openImageAct->setShortcut(Qt::CTRL | Qt::Key_O); //slot triggered with ctrl O key
 
-    QMenu *fileMenu = new QMenu("&file");
+    QMenu *fileMenu = new QMenu("&File");
     fileMenu->addAction(openImageAct);
     menuBar()->addMenu(fileMenu);
 

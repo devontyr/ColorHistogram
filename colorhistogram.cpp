@@ -68,12 +68,13 @@ void ColorHistogram::getRgbFreq() {
 void ColorHistogram::buildPixmap() {
 
     if (colorChoice->currentText() == "Red") { // green = col, blue = row
+        int scaleNum = scaleChoice->currentText().toInt();
         for (int iSlice = 0; iSlice < 256; ++iSlice) { //slider value
             QImage blank(256, 256, QImage::Format_RGB32);
             for (int iCol = 0; iCol < 256; ++iCol) {
                 for (int iRow = 0; iRow < 256; ++iRow) {
                     int freq = rgbFreq[(iSlice<<16)|(iCol<<8)|iRow];
-                    freq *= scaleChoice->currentText().toInt();
+                    freq *= scaleNum;
                     if (freq > 255) freq = 255;
                     blank.setPixel(iCol, iRow, freq * 0x010101);
                 }
@@ -110,6 +111,22 @@ void ColorHistogram::buildPixmap() {
             slices[iSlice] = QPixmap::fromImage(blank);
         }
     }
+    if (colorChoice->currentText() == "Sum") {
+        for (int iSum = 0; iSum <= 3*255; ++iSum) {
+            QImage blank(256, 256, QImage::Format_RGB32);
+            for (int iCol = 0; iCol < 256; ++iCol) {
+                for (int iRow = 0; iRow < 256; ++iRow) {
+                    int rFreq; int gFreq; int bFreq;
+                    int rVal = iSum - (iCol + iRow);
+                    if (rVal < 0 | rVal > 255) rVal = 0;
+                    gFreq = rgbFreq[(rVal<<16)|(iCol<<8)|iRow];
+                    int sumValue = rFreq + gFreq + bFreq;
+                    blank.setPixel(iCol, iRow, sumValue);
+                }
+            }
+        }
+    }
+
     sliderMoved();
 }
 
@@ -126,10 +143,12 @@ void ColorHistogram::comboBoxChanged() {
 // slider goes from 0 - 3*255
 // QVector<pixmaps> needs 3*255 elements
 // histogram needs to be made with loop 0-3*255, for each one, 256x256 image set similar to before
-// except the color value being looked up is
+// except the color value being looked up is...
 // if red, green and blue are col and row, red is value is the sum minus the green & blue
 // if red is less than 0 or more than 255, treat is as 0
 // otherwise look up in freq table
+
+//
 
 // sum = 0 while sum <= 3*255
 // inner loop: compute missing color freq
